@@ -12,7 +12,7 @@ namespace SortInventory
         }
 
         public void Update()
-        {   
+        {
             if (CanvasHelper.ActiveMenu == MenuType.Inventory && Input.GetKeyDown(KeyCode.Z)) {
                 Network_Player player = RAPI.GetLocalPlayer();
                 if (player != null) {
@@ -23,7 +23,7 @@ namespace SortInventory
 
         private void SortPlayerInventory(Network_Player player) {
             PlayerInventory inv = player.Inventory;
-        
+
             // Get all of the inventory slots that are not in the hotbar.
             List<Slot> nonHotbar = inv.allSlots.GetRange(player.Inventory.hotslotCount, player.Inventory.allSlots.Count - player.Inventory.hotslotCount);
 
@@ -50,8 +50,8 @@ namespace SortInventory
                 // Reset the slot.
                 slot.Reset();
             }
-            
-            tempInstances.Sort((x, y) => String.Compare(x.settings_Inventory.DisplayName, y.settings_Inventory.DisplayName, StringComparison.Ordinal));
+
+            tempInstances.Sort(new ItemComparer());
 
             // Do some assignments to sort it in the inventory
             var i = 0;
@@ -121,6 +121,24 @@ namespace SortInventory
         public void OnModUnload()
         {
             Debug.Log("SortInventory has been unloaded!");
+        }
+    }
+
+    sealed class ItemComparer : IComparer<ItemInstance>
+    {
+        public int Compare(ItemInstance x, ItemInstance y)
+        {
+            var localized = String.Compare(x.settings_Inventory.DisplayName, y.settings_Inventory.DisplayName, StringComparison.CurrentCultureIgnoreCase);
+            if (localized != 0)
+            {
+                return localized;
+            }
+            var unique = String.Compare(x.UniqueName, y.UniqueName, StringComparison.Ordinal);
+            if (unique != 0)
+            {
+                return unique;
+            }
+            return y.Amount.CompareTo(x.Amount); // Bigger stacks to the front
         }
     }
 }
