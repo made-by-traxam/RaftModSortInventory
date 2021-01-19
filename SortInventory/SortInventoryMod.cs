@@ -128,7 +128,7 @@ namespace SortInventory
     {
         public int Compare(ItemInstance x, ItemInstance y)
         {
-            var localized = String.Compare(x.settings_Inventory.DisplayName, y.settings_Inventory.DisplayName, StringComparison.CurrentCultureIgnoreCase);
+            var localized = String.Compare(x.baseItem.settings_Inventory.DisplayName, y.baseItem.settings_Inventory.DisplayName, StringComparison.CurrentCultureIgnoreCase);
             if (localized != 0)
             {
                 return localized;
