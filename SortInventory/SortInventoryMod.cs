@@ -12,7 +12,7 @@ namespace SortInventory
         }
 
         public void Update()
-        {   
+        {
             if (CanvasHelper.ActiveMenu == MenuType.Inventory && Input.GetKeyDown(KeyCode.Z)) {
                 Network_Player player = RAPI.GetLocalPlayer();
                 if (player != null) {
@@ -23,7 +23,7 @@ namespace SortInventory
 
         private void SortPlayerInventory(Network_Player player) {
             PlayerInventory inv = player.Inventory;
-        
+
             // Get all of the inventory slots that are not in the hotbar.
             List<Slot> nonHotbar = inv.allSlots.GetRange(player.Inventory.hotslotCount, player.Inventory.allSlots.Count - player.Inventory.hotslotCount);
 
@@ -51,7 +51,7 @@ namespace SortInventory
                 slot.Reset();
             }
 
-            tempInstances.Sort((x, y) => String.Compare(x.UniqueName, y.UniqueName, StringComparison.Ordinal));
+            tempInstances.Sort(new ItemComparer());
 
             // Do some assignments to sort it in the inventory
             var i = 0;
@@ -68,7 +68,7 @@ namespace SortInventory
                 Slot currSlot = nonHotbar[i];
                 if (!currSlot.IsEmpty)
                 {
-                    Slot toSlot = this.FindSuitableSlot(nonHotbar, currSlot.GetItemBase());
+                    Slot toSlot = this.FindSuitableSlot(nonHotbar, i, currSlot.GetItemBase());
                     if (toSlot != currSlot && toSlot != null)
                     {
                         this.TransferItems(toSlot, currSlot);
@@ -100,11 +100,12 @@ namespace SortInventory
             }
         }
 
-        private Slot FindSuitableSlot(List<Slot> inv, Item_Base stackableItem = null)
+        private Slot FindSuitableSlot(List<Slot> inv, int currIndex, Item_Base stackableItem = null)
         {
             bool flag = stackableItem != null && stackableItem.settings_Inventory.Stackable;
-            foreach (Slot slot2 in inv)
+            for (var i = 0; i < currIndex; i++)
             {
+                Slot slot2 = inv[i];
                 if (slot2.IsEmpty)
                 {
                     return slot2;
@@ -120,6 +121,24 @@ namespace SortInventory
         public void OnModUnload()
         {
             Debug.Log("SortInventory has been unloaded!");
+        }
+    }
+
+    sealed class ItemComparer : IComparer<ItemInstance>
+    {
+        public int Compare(ItemInstance x, ItemInstance y)
+        {
+            var localized = String.Compare(x.baseItem.settings_Inventory.DisplayName, y.baseItem.settings_Inventory.DisplayName, StringComparison.CurrentCultureIgnoreCase);
+            if (localized != 0)
+            {
+                return localized;
+            }
+            var unique = String.Compare(x.UniqueName, y.UniqueName, StringComparison.Ordinal);
+            if (unique != 0)
+            {
+                return unique;
+            }
+            return y.Amount.CompareTo(x.Amount); // Bigger stacks to the front
         }
     }
 }
