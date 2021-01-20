@@ -23,4 +23,5 @@ If you discover a bug or want to make an enhancement, please create an issue and
 ## Credits
 - idea and original code by [wazupwiop](https://github.com/mcglonelevi), the original source files are available [on GitHub](https://github.com/mcglonelevi/RaftModSortInventory)
 - new implementation by [traxam](https://trax.am/)
+- bug fixes by [@dcsobral](https://github.com/dcsobral)
 - icon image based on [an icon image](https://www.flaticon.com/free-icon/sort_178417) by [Freepik](https://www.freepik.com/), licensed [Creative Commons BY 3.0](http://creativecommons.org/licenses/by/3.0/)
